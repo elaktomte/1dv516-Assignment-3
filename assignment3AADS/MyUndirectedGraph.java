@@ -5,9 +5,9 @@ import java.util.List;
 public class MyUndirectedGraph implements A3Graph {
 	int totalVertices;
 	Node[] vertices;
-	ArrayList<List<Integer>> connectedList = new ArrayList<List<Integer>>();
-	
-	
+	List<List<Integer>> connectedList = new ArrayList<List<Integer>>();
+
+
 	public MyUndirectedGraph (int vertices) {
 		this.totalVertices = vertices;
 		this.vertices = new Node[vertices];
@@ -24,14 +24,16 @@ public class MyUndirectedGraph implements A3Graph {
 	public void addEdge(int sourceVertex, int targetVertex) {
 		vertices[sourceVertex].addEdge(targetVertex);
 		vertices[targetVertex].addEdge(sourceVertex);
-		connectedList.get(0).add(sourceVertex);
-		connectedList.get(0).add(targetVertex);
 	}
 
 	@Override
 	public boolean isConnected() {
-		// TODO Auto-generated method stub
-		return false;
+		boolean Answer = false;
+		this.connectedList= connectedComponents();
+		if (connectedList.get(0).size() == totalVertices) {
+			Answer = true;
+		}
+		return Answer;
 	}
 
 	@Override
@@ -42,35 +44,46 @@ public class MyUndirectedGraph implements A3Graph {
 
 	@Override
 	public List<List<Integer>> connectedComponents() {
-		ArrayList<List<Integer>>	connectedList = new ArrayList<List<Integer>>();
-		List innerList = connectedList.get(0);
-		for (int i = 0; i < vertices.length; i++) {
+		int indexer = 0;
+		List<List<Integer>>	connectedList = new ArrayList<List<Integer>>();
+		List<Integer> innerList = new ArrayList<Integer>();
+		
+		connectedList.add(innerList);
+		innerList.add(vertices[0].vertexID);
+		innerList.addAll(vertices[0].edges);
+		for (int i = 1; i < vertices.length; i++) {
 			Node currentNode = vertices[i];
-			if(innerList.size() == 0) {
-				innerList.add(currentNode);
-				innerList.addAll(currentNode.edges);
-			}
-
-			else {
-				for (int j = 0; j< currentNode.edges.length; j++) {
-					if(currentNode.edges.length == 0) {
-						break;
-					}
-					else {
-						if(innerList.contains(currentNode.edges[j])) {
+			System.out.println("Current Node is: "+currentNode.vertexID + " and the edges are: "+currentNode.edges.toString());
+			if(currentNode.edges.size() != 0 ) {
+				for(int j = 0; j < currentNode.edges.size(); ++j) {
+					if(innerList.contains(currentNode.edges.get(j))) {
+						if(!innerList.contains(currentNode.vertexID)) {
+							innerList.add(currentNode.vertexID);
+						}
+					} else if (currentNode.edges.size() != 0 && !innerList.contains(currentNode.vertexID)){
+						boolean linked = false;
+						for (int k = 0; k < currentNode.edges.size(); k++) {
+							if (innerList.contains(currentNode.edges.get(k)) && linked == false) {
+								innerList.add(currentNode.vertexID);
+								linked = true;
+							}
 
 						}
-						else if (currentNode.edges[j] == null) {
-							break;
+						if (linked == false) {
+							System.out.println("AIDS");
+							List<Integer> newList = new ArrayList<Integer>();
+							newList.add(currentNode.vertexID);
+							connectedList.add(newList);
+							innerList = connectedList.get(connectedList.size()-1);
 						}
-						else {
-							innerList.add(currentNode.edges[j]);
-						}
-
 					}
 				}
-
-
+			}else {
+				System.out.println("current Node is: " +currentNode.vertexID);
+				List<Integer> newList = new ArrayList<Integer>();
+				connectedList.add(newList);
+				innerList = connectedList.get(connectedList.size()-1);
+				innerList.add(currentNode.vertexID);
 			}
 
 		}
@@ -88,25 +101,22 @@ public class MyUndirectedGraph implements A3Graph {
 		// TODO Auto-generated method stub
 		return A3Graph.super.eulerPath();
 	}
-	
+
 	class Node {
 		public int vertexID;
-		List<Integer> edges;
+		List<Integer> edges = new ArrayList<Integer>();
 		int currentI = 0;
 
 		public Node(int v, int maxEdges) {
-			edges = new Integer[maxEdges];
 			this.vertexID = v;
 		}
 		public void addEdge(int target) {
 			boolean answer = false;
-			for (int i = 0; i < edges.length; i++) {
-				if (edges[i] == target) {
-					answer = true;
-				}
+			if (edges.contains(target)) {
+				answer = true;
 			}
 			if (answer == false) {
-				edges[currentI++] = target;
+				edges.add(target);
 			}
 		}
 
