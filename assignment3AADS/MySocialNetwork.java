@@ -1,10 +1,13 @@
-package assignment3AADS.assignment3;
-
 import java.util.List;
 
 public class MySocialNetwork extends MyUndirectedGraph implements A3SocialNetwork {
 
-    @Override
+    public MySocialNetwork(int vertices) {
+		super(vertices);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
     public int numberOfPeopleAtFriendshipDistance(int vertexIndex, int distance) {
 	// TODO Auto-generated method stub
 	return 0;

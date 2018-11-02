@@ -1,4 +1,3 @@
-package assignment3AADS.assignment3;
 
 import java.util.List;
 

@@ -1,5 +1,3 @@
-package assignment3AADS.assignment3;
-
 import java.util.List;
 
 public class MyDirectedGraph implements A3Graph {
