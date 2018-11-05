@@ -44,38 +44,43 @@ public class MyUndirectedGraph implements A3Graph {
 
 	@Override
 	public List<List<Integer>> connectedComponents() {
-		int indexer = 0;
 		List<List<Integer>>	connectedList = new ArrayList<List<Integer>>();
 		List<Integer> innerList = new ArrayList<Integer>();
-		
+
 		connectedList.add(innerList);
 		innerList.add(vertices[0].vertexID);
 		innerList.addAll(vertices[0].edges);
+
 		for (int i = 1; i < vertices.length; i++) {
 			Node currentNode = vertices[i];
 			System.out.println("Current Node is: "+currentNode.vertexID + " and the edges are: "+currentNode.edges.toString());
 			if(currentNode.edges.size() != 0 ) {
 				for(int j = 0; j < currentNode.edges.size(); ++j) {
-					if(innerList.contains(currentNode.edges.get(j))) {
-						if(!innerList.contains(currentNode.vertexID)) {
-							innerList.add(currentNode.vertexID);
+					if (innerList.contains(currentNode.vertexID)) {
+						if (!innerList.contains(currentNode.edges.get(j))) {
+							innerList.add(currentNode.edges.get(j));
 						}
-					} else if (currentNode.edges.size() != 0 && !innerList.contains(currentNode.vertexID)){
-						boolean linked = false;
-						for (int k = 0; k < currentNode.edges.size(); k++) {
-							if (innerList.contains(currentNode.edges.get(k)) && linked == false) {
-								innerList.add(currentNode.vertexID);
-								linked = true;
+					}
+					else if (!innerList.contains(currentNode.vertexID) && innerList.contains(currentNode.edges.get(j))) {
+						innerList.add(currentNode.vertexID);
+					}
+					else if (!innerList.contains(currentNode.vertexID) && !innerList.contains(currentNode.edges.get(j))) {
+						int indexer = connectedList.size();
+						boolean isAlreadyAdded = false;
+						System.out.println("running this yo");
+						for (int k = 0; k < indexer; k++) {
+							if (connectedList.get(k).contains(currentNode.vertexID)) {
+								isAlreadyAdded = true;
+								break;
 							}
-
 						}
-						if (linked == false) {
-							System.out.println("AIDS");
-							List<Integer> newList = new ArrayList<Integer>();
-							newList.add(currentNode.vertexID);
-							connectedList.add(newList);
-							innerList = connectedList.get(connectedList.size()-1);
+						if (isAlreadyAdded == false) {
+						List<Integer> newList = new ArrayList<Integer>();
+						newList.add(currentNode.vertexID);
+						newList.addAll(currentNode.edges);
+						connectedList.add(newList);
 						}
+						isAlreadyAdded = false;
 					}
 				}
 			}else {
