@@ -1,16 +1,21 @@
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 public class MyUndirectedGraph implements A3Graph {
 	int totalVertices;
 	Node[] vertices;
 	List<List<Integer>> connectedList = new ArrayList<List<Integer>>();
-
+	LinkedList<Integer> [] CycleList;
 
 	public MyUndirectedGraph (int vertices) {
 		this.totalVertices = vertices;
 		this.vertices = new Node[vertices];
+		CycleList = new LinkedList[vertices];
+		for (int i = 0; i < vertices; i++) {
+			CycleList[i] = new LinkedList();
+		}
 	}
 
 	@Override
@@ -24,6 +29,8 @@ public class MyUndirectedGraph implements A3Graph {
 	public void addEdge(int sourceVertex, int targetVertex) {
 		vertices[sourceVertex].addEdge(targetVertex);
 		vertices[targetVertex].addEdge(sourceVertex);
+		CycleList[sourceVertex].addFirst(targetVertex);
+		CycleList[targetVertex].addFirst(sourceVertex);
 	}
 
 	@Override
@@ -36,10 +43,31 @@ public class MyUndirectedGraph implements A3Graph {
 		return Answer;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see A3Graph#isAcyclic()
+	 * 
+	 * 
+	 */
+	
 	@Override
 	public boolean isAcyclic() {
-		// TODO Auto-generated method stub
-		return false;
+		boolean answer = false;
+		boolean[] visitedNodes = new boolean[totalVertices];
+
+		
+		
+		for (int i = 0; i < totalVertices; i++) {
+			if (visitedNodes[i] == false) {
+				if(traverse(i, -1 ,visitedNodes)) {
+					answer = true;
+				}
+			}
+			
+		}
+		
+		
+		return answer;
 	}
 
 	@Override
@@ -67,7 +95,6 @@ public class MyUndirectedGraph implements A3Graph {
 					else if (!innerList.contains(currentNode.vertexID) && !innerList.contains(currentNode.edges.get(j))) {
 						int indexer = connectedList.size();
 						boolean isAlreadyAdded = false;
-						System.out.println("running this yo");
 						for (int k = 0; k < indexer; k++) {
 							if (connectedList.get(k).contains(currentNode.vertexID)) {
 								isAlreadyAdded = true;
@@ -106,6 +133,26 @@ public class MyUndirectedGraph implements A3Graph {
 		// TODO Auto-generated method stub
 		return A3Graph.super.eulerPath();
 	}
+	public boolean traverse (int current, int previous, boolean[] visited) {
+		visited[current] = true;
+		
+		
+		for (int i = 0; i < CycleList[current].size(); i++) {
+			int vertice = CycleList[current].get(i);
+			if (vertice != previous) {
+				if (visited[vertice]) {
+					return true;
+				}
+				else {
+					if (traverse(vertice, current, visited)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+		
+	}
 
 	class Node {
 		public int vertexID;
@@ -124,6 +171,7 @@ public class MyUndirectedGraph implements A3Graph {
 				edges.add(target);
 			}
 		}
+		
 
 	}  
 

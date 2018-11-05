@@ -25,18 +25,8 @@ public class TestFile {
 			System.out.println(graph.connectedList.get(i).toString());
 		}
 		System.out.println(graph.vertices[1].edges.toString());
-		
-		
-		/*
-		 * [ 1, 2,3,4,5]
-		 * [6]
-		 * [7,8]
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 */
+		System.out.println(graph.isAcyclic());
+
 		
 		
 	}
