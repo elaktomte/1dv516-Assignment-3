@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -78,7 +79,7 @@ public class MyUndirectedGraph implements A3Graph {
 		connectedList.add(innerList);
 		innerList.add(vertices[0].vertexID);
 		innerList.addAll(vertices[0].edges);
-
+		System.out.println("Current Node is: "+vertices[0].vertexID + " and the edges are: "+vertices[0].edges.toString());
 		for (int i = 1; i < vertices.length; i++) {
 			Node currentNode = vertices[i];
 			System.out.println("Current Node is: "+currentNode.vertexID + " and the edges are: "+currentNode.edges.toString());
@@ -138,26 +139,78 @@ public class MyUndirectedGraph implements A3Graph {
 		}
 		return answer;
 	}
+	public void removeEdge(int source, int target, LinkedList [] list) {
+		list[target].remove((Integer)source);
+		list[source].remove((Integer)target);
+	}
 
 	@Override
 	public List<Integer> eulerPath() {
-		Node vertice;
+		int vertice = 0;
 		ArrayList path = new ArrayList();
 		//first we need to find the first odd vertice in case the odd vertices were 2 (euler path).
-		for (int i = 0; i < vertices.length; i++) {
+		for (int i = 0; i < vertices.length; i++) 	{
 			if (vertices[i].edges.size() %2 ==1 ) {
-				vertice = vertices[i];
+				vertice = vertices[i].vertexID;
 				break;
 			}
 		}
-		// TODO Auto-generated method stub
-		return A3Graph.super.eulerPath();
-	}
-	
-	public void pathTraverse(int current, int previous, boolean[] visited) {
+		LinkedList<Integer>[] PathList = CycleList.clone();
+		while (PathList[vertice].size() >0 ) {
+			int bridges = 0;
+			for (int i = 0; i < PathList[vertice].size(); i++) {
+				if(!isABridge(PathList[vertice].get(i), vertice, PathList)) {
+					int target = PathList[vertice].get(i);
+					removeEdge(vertice, target, PathList);
+					path.add(target);
+					vertice = target;
+					break;
+				}
+				else {
+					bridges++;
+				}
+			}
+			if (bridges == PathList[vertice].size() && PathList[vertice].size() > 0) {
+				int target = PathList[vertice].getFirst();
+				removeEdge(vertice, target, PathList);
+				path.add(target);
+				vertice = target;
+			}
+		}
 		
+		
+		// TODO Auto-generated method stub
+		return path;
 	}
 	
+	public boolean isABridge(int target, int current, LinkedList<Integer>[] list) {
+		boolean answer = false;
+		boolean [] visited = new boolean [totalVertices];
+		int before = DFSPath(target, current, visited, 0, list);
+		
+		removeEdge(current, target, list);
+		int after = DFSPath(target, current, visited, 0, list);
+		
+		//reverting back
+		list[current].addFirst(target);
+		list[target].addFirst(current);
+		
+		return before > after;
+	}
+
+	public int DFSPath(int current, int previous, boolean [] visited, int counter, LinkedList<Integer>[] list) {
+		visited[current] = true;
+		for(int i = 0; i < list[current].size(); i++) {
+			int vertice = list[current].get(i);
+			if (vertice != previous) {
+				if(visited[vertice] == false) {
+					DFSPath(vertice, current, visited, counter+1, list);
+				}
+			}
+		}
+		return counter;
+	}
+
 	public boolean traverse (int current, int previous, boolean[] visited) {
 		visited[current] = true;
 
