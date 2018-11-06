@@ -49,24 +49,24 @@ public class MyUndirectedGraph implements A3Graph {
 	 * 
 	 * 
 	 */
-	
+
 	@Override
 	public boolean isAcyclic() {
 		boolean answer = false;
 		boolean[] visitedNodes = new boolean[totalVertices];
 
-		
-		
+
+
 		for (int i = 0; i < totalVertices; i++) {
 			if (visitedNodes[i] == false) {
 				if(traverse(i, -1 ,visitedNodes)) {
 					answer = true;
 				}
 			}
-			
+
 		}
-		
-		
+
+
 		return answer;
 	}
 
@@ -102,10 +102,10 @@ public class MyUndirectedGraph implements A3Graph {
 							}
 						}
 						if (isAlreadyAdded == false) {
-						List<Integer> newList = new ArrayList<Integer>();
-						newList.add(currentNode.vertexID);
-						newList.addAll(currentNode.edges);
-						connectedList.add(newList);
+							List<Integer> newList = new ArrayList<Integer>();
+							newList.add(currentNode.vertexID);
+							newList.addAll(currentNode.edges);
+							connectedList.add(newList);
 						}
 						isAlreadyAdded = false;
 					}
@@ -124,19 +124,44 @@ public class MyUndirectedGraph implements A3Graph {
 
 	@Override
 	public boolean hasEulerPath() {
-		// TODO Auto-generated method stub
-		return A3Graph.super.hasEulerPath();
+		boolean answer = false;
+		if (isConnected()) {
+			int oddVertices = 0;
+			for (int i = 0; i<vertices.length; i++) {
+				if (vertices[i].edges.size() %2 == 1) {
+					oddVertices++;
+				}
+			}
+			if (oddVertices == 2 || oddVertices == 0) {
+				answer = true;
+			}
+		}
+		return answer;
 	}
 
 	@Override
 	public List<Integer> eulerPath() {
+		Node vertice;
+		ArrayList path = new ArrayList();
+		//first we need to find the first odd vertice in case the odd vertices were 2 (euler path).
+		for (int i = 0; i < vertices.length; i++) {
+			if (vertices[i].edges.size() %2 ==1 ) {
+				vertice = vertices[i];
+				break;
+			}
+		}
 		// TODO Auto-generated method stub
 		return A3Graph.super.eulerPath();
 	}
+	
+	public void pathTraverse(int current, int previous, boolean[] visited) {
+		
+	}
+	
 	public boolean traverse (int current, int previous, boolean[] visited) {
 		visited[current] = true;
-		
-		
+
+
 		for (int i = 0; i < CycleList[current].size(); i++) {
 			int vertice = CycleList[current].get(i);
 			if (vertice != previous) {
@@ -151,7 +176,7 @@ public class MyUndirectedGraph implements A3Graph {
 			}
 		}
 		return false;
-		
+
 	}
 
 	class Node {
@@ -171,7 +196,7 @@ public class MyUndirectedGraph implements A3Graph {
 				edges.add(target);
 			}
 		}
-		
+
 
 	}  
 
