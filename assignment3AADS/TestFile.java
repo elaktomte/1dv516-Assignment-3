@@ -3,11 +3,13 @@ import java.util.List;
 public class TestFile {
 
 	public static void main(String[] args) {
-
+		//firstTest();
+		secondTest();
+		
+		
+	}
+	public static void firstTest() {
 		MyUndirectedGraph graph = new MyUndirectedGraph(5);
-		for(int i = 0; i < 5; i++) {
-			graph.addVertex(i);
-		}
 		
 		graph.addEdge(0, 1);
 		graph.addEdge(0, 2);
@@ -28,6 +30,31 @@ public class TestFile {
 		
 		System.out.println(graph.eulerPath().toString());
 
+	}
+	public static void secondTest() {
+		MySocialNetwork network = new MySocialNetwork(15);
+		network.addEdge(4, 0 );
+		network.addEdge(4, 1);
+		network.addEdge(4, 3);
+		network.addEdge(4, 5);
+		network.addEdge(4, 6);
+		network.addEdge(4, 7);
+		network.addEdge(4, 8);
+		network.addEdge(4, 11);
+		network.addEdge(4, 14);
+		network.addEdge(9, 8);
+		network.addEdge(9, 7);
+		network.addEdge(9, 6);
+		network.addEdge(10, 6);
+		network.addEdge(0, 3);
+		network.addEdge(0, 2);
+		network.addEdge(13, 5);
+		network.addEdge(5, 2);
+		network.addEdge(12, 2);
+		network.addEdge(0, 1);
+		network.addEdge(1, 2);
+		network.addEdge(1, 3);
+		network.addEdge(2, 3);
 		
 		
 	}

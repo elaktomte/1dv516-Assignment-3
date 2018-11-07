@@ -17,6 +17,9 @@ public class MyUndirectedGraph implements A3Graph {
 		for (int i = 0; i < vertices; i++) {
 			CycleList[i] = new LinkedList();
 		}
+		for(int i = 0; i< totalVertices; i++) {
+			addVertex(i);
+		}
 	}
 
 	@Override
