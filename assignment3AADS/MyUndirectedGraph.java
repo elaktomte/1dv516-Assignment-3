@@ -79,10 +79,9 @@ public class MyUndirectedGraph implements A3Graph {
 		connectedList.add(innerList);
 		innerList.add(vertices[0].vertexID);
 		innerList.addAll(vertices[0].edges);
-		System.out.println("Current Node is: "+vertices[0].vertexID + " and the edges are: "+vertices[0].edges.toString());
+		
 		for (int i = 1; i < vertices.length; i++) {
 			Node currentNode = vertices[i];
-			System.out.println("Current Node is: "+currentNode.vertexID + " and the edges are: "+currentNode.edges.toString());
 			if(currentNode.edges.size() != 0 ) {
 				for(int j = 0; j < currentNode.edges.size(); ++j) {
 					if (innerList.contains(currentNode.vertexID)) {
@@ -156,6 +155,7 @@ public class MyUndirectedGraph implements A3Graph {
 			}
 		}
 		LinkedList<Integer>[] PathList = CycleList.clone();
+		path.add(vertice);
 		while (PathList[vertice].size() >0 ) {
 			int bridges = 0;
 			for (int i = 0; i < PathList[vertice].size(); i++) {
@@ -166,49 +166,60 @@ public class MyUndirectedGraph implements A3Graph {
 					vertice = target;
 					break;
 				}
+				else if (PathList[vertice].size() == 1){
+					int target = PathList[vertice].get(i);
+					removeEdge(vertice, target, PathList);
+					path.add(target);
+					vertice = target;
+					break;
+				}
 				else {
+					//System.out.println("It is");
 					bridges++;
 				}
 			}
 			if (bridges == PathList[vertice].size() && PathList[vertice].size() > 0) {
+				System.out.println("They were all bridges?");
 				int target = PathList[vertice].getFirst();
 				removeEdge(vertice, target, PathList);
 				path.add(target);
 				vertice = target;
 			}
 		}
-		
-		
-		// TODO Auto-generated method stub
 		return path;
 	}
 	
 	public boolean isABridge(int target, int current, LinkedList<Integer>[] list) {
 		boolean answer = false;
 		boolean [] visited = new boolean [totalVertices];
-		int before = DFSPath(target, current, visited, 0, list);
+		int before = DFSPath(target, current, visited, 0, list, 0);
 		
 		removeEdge(current, target, list);
-		int after = DFSPath(target, current, visited, 0, list);
+		visited = new boolean [totalVertices];
+		int after = DFSPath(target, current, visited, 0, list, 1);
 		
 		//reverting back
-		list[current].addFirst(target);
-		list[target].addFirst(current);
+		list[current].add(target);
+		list[target].add(current);
 		
 		return before > after;
 	}
 
-	public int DFSPath(int current, int previous, boolean [] visited, int counter, LinkedList<Integer>[] list) {
+	public int DFSPath(int current, int previous, boolean [] visited, int counter, LinkedList<Integer>[] list, int FirstTime) {
 		visited[current] = true;
+		int Counter = counter;
 		for(int i = 0; i < list[current].size(); i++) {
 			int vertice = list[current].get(i);
-			if (vertice != previous) {
-				if(visited[vertice] == false) {
-					DFSPath(vertice, current, visited, counter+1, list);
+			if (vertice != previous && FirstTime == 1) {
+				if(!visited[vertice]) {
+					Counter = DFSPath(vertice, current, visited, Counter, list, 1) +1;
 				}
 			}
+			else if (!visited[vertice] && FirstTime == 0) {
+				Counter = DFSPath(vertice, current, visited, Counter, list, 1) +1;
+			}
 		}
-		return counter;
+		return Counter;
 	}
 
 	public boolean traverse (int current, int previous, boolean[] visited) {
