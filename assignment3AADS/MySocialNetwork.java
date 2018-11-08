@@ -52,7 +52,6 @@ public class MySocialNetwork extends MyUndirectedGraph implements A3SocialNetwor
 		Levels = DepthDFS(vertexIndex, Levels, 0, visited);	
 		int distance = 0;
 		for (int i = 0; i < Levels.length; i++) {
-			System.out.println("["+i+"] : " +Levels[i]);
 			if (Levels[i] > distance) {
 				distance = Levels[i];
 			}
@@ -75,14 +74,33 @@ public class MySocialNetwork extends MyUndirectedGraph implements A3SocialNetwor
 
 	@Override
 	public List<Integer> possibleFriends(int vertexIndex) {
-		// TODO Auto-generated method stub
-		return null;
+		Integer[] levels = new Integer[totalVertices];
+		boolean[] visited = new boolean[totalVertices];
+		levels = DepthDFS(vertexIndex,levels, 0, visited);
+		ArrayList possibleFriends = new ArrayList();
+		LinkedList friend = CycleList[vertexIndex];
+		for (int i = 0; i < levels.length; i++) {
+			if (levels[i] ==  2) {
+				int friends = 0;
+				for (int j = 0; j< CycleList[i].size(); j++) {
+					if (friend.contains(CycleList[i].get(j))){
+						friends++;
+					}
+				}
+				if (friends >2) {
+					possibleFriends.add(i);
+				}
+			}
+		}
+		
+		
+		return possibleFriends;
 	}
 
 	public Integer[] DepthDFS(int current, Integer[] levels, int depth, boolean[] visited) {
 		visited[current] = true;
 		if (levels[current] != null) {
-			if (levels[current] < depth) {
+			if (levels[current] > depth) {
 				levels[current] = depth;
 			}
 		}
@@ -90,8 +108,12 @@ public class MySocialNetwork extends MyUndirectedGraph implements A3SocialNetwor
 			levels[current] = depth;
 		}
 		for (int i = 0; i < CycleList[current].size(); i++) {
-			if(!visited[CycleList[current].get(i)])
+			if(!visited[CycleList[current].get(i)]) {
 				levels = DepthDFS(CycleList[current].get(i), levels, depth+1, visited);
+			}
+			else if( levels[CycleList[current].get(i)] > depth+1 ) {
+				levels = DepthDFS(CycleList[current].get(i), levels, depth+1, visited);
+			}
 		}
 
 		return levels;

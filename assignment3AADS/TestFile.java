@@ -57,7 +57,8 @@ public class TestFile {
 		network.addEdge(2, 3);
 		
 		System.out.println(network.numberOfPeopleAtFriendshipDistance(4, 2));
-		System.out.print(network.furthestDistanceInFriendshipRelationships(12));
+		System.out.println(network.furthestDistanceInFriendshipRelationships(12));
+		System.out.println(network.possibleFriends(4).toString());
 		
 	}
 
