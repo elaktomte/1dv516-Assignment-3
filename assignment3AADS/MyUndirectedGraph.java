@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,6 +16,9 @@ public class MyUndirectedGraph implements A3Graph {
 		CycleList = new LinkedList[vertices];
 		for (int i = 0; i < vertices; i++) {
 			CycleList[i] = new LinkedList();
+		}
+		for(int i = 0; i< totalVertices; i++) {
+			addVertex(i);
 		}
 	}
 
@@ -49,24 +53,24 @@ public class MyUndirectedGraph implements A3Graph {
 	 * 
 	 * 
 	 */
-	
+
 	@Override
 	public boolean isAcyclic() {
 		boolean answer = false;
 		boolean[] visitedNodes = new boolean[totalVertices];
 
-		
-		
+
+
 		for (int i = 0; i < totalVertices; i++) {
 			if (visitedNodes[i] == false) {
 				if(traverse(i, -1 ,visitedNodes)) {
 					answer = true;
 				}
 			}
-			
+
 		}
-		
-		
+
+
 		return answer;
 	}
 
@@ -78,10 +82,9 @@ public class MyUndirectedGraph implements A3Graph {
 		connectedList.add(innerList);
 		innerList.add(vertices[0].vertexID);
 		innerList.addAll(vertices[0].edges);
-
+		
 		for (int i = 1; i < vertices.length; i++) {
 			Node currentNode = vertices[i];
-			System.out.println("Current Node is: "+currentNode.vertexID + " and the edges are: "+currentNode.edges.toString());
 			if(currentNode.edges.size() != 0 ) {
 				for(int j = 0; j < currentNode.edges.size(); ++j) {
 					if (innerList.contains(currentNode.vertexID)) {
@@ -102,10 +105,10 @@ public class MyUndirectedGraph implements A3Graph {
 							}
 						}
 						if (isAlreadyAdded == false) {
-						List<Integer> newList = new ArrayList<Integer>();
-						newList.add(currentNode.vertexID);
-						newList.addAll(currentNode.edges);
-						connectedList.add(newList);
+							List<Integer> newList = new ArrayList<Integer>();
+							newList.add(currentNode.vertexID);
+							newList.addAll(currentNode.edges);
+							connectedList.add(newList);
 						}
 						isAlreadyAdded = false;
 					}
@@ -124,19 +127,108 @@ public class MyUndirectedGraph implements A3Graph {
 
 	@Override
 	public boolean hasEulerPath() {
-		// TODO Auto-generated method stub
-		return A3Graph.super.hasEulerPath();
+		boolean answer = false;
+		if (isConnected()) {
+			int oddVertices = 0;
+			for (int i = 0; i<vertices.length; i++) {
+				if (vertices[i].edges.size() %2 == 1) {
+					oddVertices++;
+				}
+			}
+			if (oddVertices == 2 || oddVertices == 0) {
+				answer = true;
+			}
+		}
+		return answer;
+	}
+	public void removeEdge(int source, int target, LinkedList [] list) {
+		list[target].remove((Integer)source);
+		list[source].remove((Integer)target);
 	}
 
 	@Override
 	public List<Integer> eulerPath() {
-		// TODO Auto-generated method stub
-		return A3Graph.super.eulerPath();
+		int vertice = 0;
+		ArrayList path = new ArrayList();
+		//first we need to find the first odd vertice in case the odd vertices were 2 (euler path).
+		for (int i = 0; i < vertices.length; i++) 	{
+			if (vertices[i].edges.size() %2 ==1 ) {
+				vertice = vertices[i].vertexID;
+				break;
+			}
+		}
+		LinkedList<Integer>[] PathList = CycleList.clone();
+		path.add(vertice);
+		while (PathList[vertice].size() >0 ) {
+			int bridges = 0;
+			for (int i = 0; i < PathList[vertice].size(); i++) {
+				if(!isABridge(PathList[vertice].get(i), vertice, PathList)) {
+					int target = PathList[vertice].get(i);
+					removeEdge(vertice, target, PathList);
+					path.add(target);
+					vertice = target;
+					break;
+				}
+				else if (PathList[vertice].size() == 1){
+					int target = PathList[vertice].get(i);
+					removeEdge(vertice, target, PathList);
+					path.add(target);
+					vertice = target;
+					break;
+				}
+				else {
+					//System.out.println("It is");
+					bridges++;
+				}
+			}
+			if (bridges == PathList[vertice].size() && PathList[vertice].size() > 0) {
+				System.out.println("They were all bridges?");
+				int target = PathList[vertice].getFirst();
+				removeEdge(vertice, target, PathList);
+				path.add(target);
+				vertice = target;
+			}
+		}
+		return path;
 	}
+	
+	public boolean isABridge(int target, int current, LinkedList<Integer>[] list) {
+		boolean answer = false;
+		boolean [] visited = new boolean [totalVertices];
+		int before = DFSPath(target, current, visited, 0, list, 0);
+		
+		removeEdge(current, target, list);
+		visited = new boolean [totalVertices];
+		int after = DFSPath(target, current, visited, 0, list, 1);
+		
+		//reverting back
+		list[current].add(target);
+		list[target].add(current);
+		
+		return before > after;
+	}
+
+	public int DFSPath(int current, int previous, boolean [] visited, int counter, LinkedList<Integer>[] list, int FirstTime) {
+		visited[current] = true;
+		int Counter = counter;
+		for(int i = 0; i < list[current].size(); i++) {
+			int vertice = list[current].get(i);
+			if (vertice != previous && FirstTime == 1) {
+				if(!visited[vertice]) {
+					Counter = DFSPath(vertice, current, visited, Counter, list, 1) +1;
+				}
+			}
+			else if (!visited[vertice] && FirstTime == 0) {
+				Counter = DFSPath(vertice, current, visited, Counter, list, 1) +1;
+			}
+		}
+		return Counter;
+	}
+
 	public boolean traverse (int current, int previous, boolean[] visited) {
 		visited[current] = true;
-		
-		
+
+
 		for (int i = 0; i < CycleList[current].size(); i++) {
 			int vertice = CycleList[current].get(i);
 			if (vertice != previous) {
@@ -151,7 +243,7 @@ public class MyUndirectedGraph implements A3Graph {
 			}
 		}
 		return false;
-		
+
 	}
 
 	class Node {
@@ -171,7 +263,7 @@ public class MyUndirectedGraph implements A3Graph {
 				edges.add(target);
 			}
 		}
-		
+
 
 	}  
 
